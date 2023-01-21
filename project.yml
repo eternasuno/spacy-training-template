@@ -1,0 +1,90 @@
+title: "Spacy training project template."
+description: "This project is a template for spaCy training project. "
+vars:
+  name: "training_template"
+  version: "0.0.1"
+  gpu_id: -1
+  config: "development"
+
+# These are the directories that the project needs. The project CLI will make
+# sure that they always exist.
+directories: ["assets", "training", "configs", "metrics", "packages", "scripts", "corpus"]
+
+# Assets that should be downloaded or available in the directory.
+assets:
+  - dest: "assets//${vars.config}//train.csv"
+    description: "The training data"
+  - dest: "assets//${vars.config}//dev.csv"
+    description: "The development data"
+  - dest: "assets//${vars.config}//test.csv"
+    description: "The test data"
+
+# Workflows are sequences of commands (see below) executed in order. You can
+# run them via "spacy project run [workflow]". If a commands's inputs/outputs
+# haven't changed, it won't be re-run.
+workflows:
+  all:
+    - preprocess
+    - train
+    - evaluate
+    - package
+
+# Project commands, specified in a style similar to CI config files (e.g. Azure
+# pipelines). The name is the command name that lets you trigger the command
+# via "spacy project run [command] [path]". The help message is optional and
+# shown when executing "spacy project run [optional command] [path] --help".
+commands:
+  - name: init
+    help: "init project"
+    script:
+      - "/bin/sh init.sh ${vars.config}"
+
+  - name: preprocess
+    help: "Convert the corpus to spaCy's format"
+    script:
+      - "python scripts/convert_corpus.py --lang ja --assets-dir assets/${vars.config} --corpus-dir corpus/${vars.config}"
+    deps:
+      - "assets/${vars.config}/train.csv"
+      - "assets/${vars.config}/dev.csv"
+      - "assets/${vars.config}/test.csv"
+    outputs_no_cache:
+      - "corpus/${vars.config}/train.spacy"
+      - "corpus/${vars.config}/dev.spacy"
+      - "corpus/${vars.config}/test.spacy"
+
+  - name: train
+    help: "Train a spaCy pipeline using the specified corpus and config"
+    script:
+      - "python -m spacy train configs/${vars.config}.cfg -o training/${vars.config} --gpu-id ${vars.gpu_id} --paths.train corpus/${vars.config}/train.spacy --paths.dev corpus/${vars.config}/dev.spacy"
+    deps:
+      - "corpus/${vars.config}/train.spacy"
+      - "corpus/${vars.config}/dev.spacy"
+      - "configs/${vars.config}.cfg"
+    outputs:
+      - "training/${vars.config}/model-best"
+
+  - name: evaluate
+    help: "Evaluate on the test data and save the metrics"
+    script:
+      - "python -m spacy evaluate training/${vars.config}/model-best corpus/${vars.config}/test.spacy --output metrics/${vars.config}.json"
+    deps:
+      - "training/${vars.config}/model-best"
+      - "corpus/${vars.config}/test.spacy"
+    outputs:
+      - "metrics/${vars.config}.json"
+
+  - name: package
+    help: "Package the trained model so it can be installed"
+    script:
+      - "python -m spacy package training/${vars.config}/model-best packages/ --name ${vars.name}_${vars.config} --force --version ${vars.version} --build wheel --meta-path meta.json"
+    deps:
+      - "training/${vars.config}/model-best"
+    outputs_no_cache:
+      - "packages/${vars.name}-${vars.config}-${vars.version}/dist/${vars.name}-${vars.config}-${vars.version}.tar.gz"
+  
+  - name: assemble
+    help: Combine the model with a pretrained pipeline.
+    script:
+      - "python -m spacy assemble configs/${vars.config}.cfg ${vars.config}_with_pretrained"
+    deps:
+      - "training/${vars.config}/model-best"

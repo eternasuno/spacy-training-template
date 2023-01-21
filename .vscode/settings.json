@@ -1,0 +1,7 @@
+{
+    "editor.formatOnPaste": true,
+    "editor.formatOnSave": true,
+    "editor.formatOnSaveMode": "modificationsIfAvailable",
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.autoImportUserSymbols": true
+}
