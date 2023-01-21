@@ -76,7 +76,7 @@ commands:
   - name: package
     help: "Package the trained model so it can be installed"
     script:
-      - "python -m spacy package training/${vars.config}/model-best packages/ --name ${vars.name}_${vars.config} --force --version ${vars.version} --build wheel --meta-path meta.json"
+      - "python -m spacy package training/${vars.config}/model-best packages/ --name ${vars.name}_${vars.config} --force --version ${vars.version} --build wheel"
     deps:
       - "training/${vars.config}/model-best"
     outputs_no_cache:

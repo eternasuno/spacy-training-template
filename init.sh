@@ -2,13 +2,14 @@
 
 CONFIG=${1}
 
-mkdir -p assets/${vars.config} 
-mkdir -p corpus/${vars.config}
-mkdir -p training/${vars.config}
+mkdir -p assets/$CONFIG 
+mkdir -p corpus/$CONFIG
+mkdir -p training/$CONFIG
 
 if [ CONFIG == "production"];
 then
-    python -m spacy download ja-ginza-electra
+    pip install -U ja_ginza_electra
 else
-    python -m spacy download ja-ginza
+    pip install -U ja_ginza
+fi
 

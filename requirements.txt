@@ -1,4 +1,5 @@
 # python==3.10
 spacy==3.3.1
+wheel==0.38.4
 # ja-ginza==5.1.2
 # ja-ginza-electra==5.1.2

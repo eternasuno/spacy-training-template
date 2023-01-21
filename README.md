@@ -44,8 +44,8 @@ in the project directory.
 
 | File | Source | Description |
 | --- | --- | --- |
-| [`assets//development//train.csv`](assets//development//train.csv) | Local | The training data |
-| [`assets//development//dev.csv`](assets//development//dev.csv) | Local | The development data |
-| [`assets//development//test.csv`](assets//development//test.csv) | Local | The test data |
+| [`assets/development/train.csv`](assets/development/train.csv) | Local | The training data |
+| [`assets/development/dev.csv`](assets/development/dev.csv) | Local | The development data |
+| [`assets/development/test.csv`](assets/development/test.csv) | Local | The test data |
 
 <!-- SPACY PROJECT: AUTO-GENERATED DOCS END (do not remove) -->
